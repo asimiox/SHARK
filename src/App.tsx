@@ -20,26 +20,8 @@ export default function App() {
     isEnded: false,
   });
 
-  // Secret simulation toggle (A single click on "SHARK" triggers the end state instantly for previewing confetti/layouts)
-  const [testMode, setTestMode] = useState(false);
-
-  const handleShrkClick = () => {
-    setTestMode((current) => !current);
-  };
-
   useEffect(() => {
     const updateCountdown = () => {
-      if (testMode) {
-        setTimeLeft({
-          days: "00",
-          hours: "00",
-          minutes: "00",
-          seconds: "00",
-          isEnded: true,
-        });
-        return;
-      }
-
       const now = Date.now();
       const difference = TARGET_TIME - now;
 
@@ -72,7 +54,7 @@ export default function App() {
     const interval = setInterval(updateCountdown, 1000);
 
     return () => clearInterval(interval);
-  }, [testMode]);
+  }, []);
 
   const actuallyEnded = timeLeft.isEnded;
 
@@ -234,9 +216,7 @@ export default function App() {
               {/* SHARK Label underneath */}
               <div 
                 id="shrk-container"
-                onClick={handleShrkClick}
-                className="mt-16 sm:mt-24 md:mt-32 cursor-pointer active:scale-95 transition-transform duration-300 select-none pb-2 group"
-                title="Tap to test countdown state"
+                className="mt-16 sm:mt-24 md:mt-32 select-none pb-2 group"
               >
                 <div className="font-sans-luxury text-xs sm:text-sm tracking-[0.95em] text-white font-light uppercase pl-[0.95em] opacity-75 group-hover:opacity-100 group-hover:tracking-[1.12em] transition-all duration-700 ease-out">
                   SHARK
@@ -255,8 +235,7 @@ export default function App() {
                 Happy Birthday 🎉
               </h1>
               <div 
-                onClick={handleShrkClick}
-                className="cursor-pointer font-sans-luxury text-xs sm:text-sm tracking-[0.95em] text-white font-light uppercase pl-[0.95em] opacity-90 mt-2 hover:opacity-100 hover:tracking-[1.10em] transition-all duration-700"
+                className="font-sans-luxury text-xs sm:text-sm tracking-[0.95em] text-white font-light uppercase pl-[0.95em] opacity-90 mt-2 hover:opacity-100 hover:tracking-[1.10em] transition-all duration-700"
               >
                 SHARK
               </div>
@@ -270,7 +249,6 @@ export default function App() {
         id="footer-spacer"
         className="text-center text-[9px] tracking-[0.2em] font-sans-luxury text-zinc-700/20 py-2 select-none self-center z-20"
       >
-        {testMode && "DEVELOPMENT SIMULATED TARGET STATE"}
       </div>
     </div>
   );

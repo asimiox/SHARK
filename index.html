@@ -1174,10 +1174,11 @@
       <div class="music-settings-body">
         <label class="audio-input-label">Select Audio Source:</label>
         <select id="audio-source-select" onchange="changeAudioSource(this.value)" class="glass-select">
+          <option value="aud">🎵 GitHub Audio File (aud.mp3)</option>
           <option value="preset-1">✨ Soft Romantic Piano Instrumental</option>
           <option value="preset-2">💖 Classical Heartfelt Melody</option>
           <option value="synth">🎹 Dreamy Synthesizer Chords</option>
-          <option value="custom">📁 Upload Your Own Audio File</option>
+          <option value="custom">📁 Upload File from Device</option>
           <option value="url">🔗 Custom Audio Web Link</option>
         </select>
 
@@ -1218,8 +1219,10 @@
   </div>
 
   <!-- HTML5 Background Audio Element -->
-  <audio id="bg-audio" loop preload="auto">
-    <source id="audio-source" src="https://actions.google.com/sounds/v1/ambiences/calm_piano.ogg" type="audio/ogg">
+  <audio id="bg-audio" loop preload="auto" src="aud.mp3">
+    <source src="aud.mp3" type="audio/mpeg">
+    <source src="./aud.mp3" type="audio/mpeg">
+    <source src="https://actions.google.com/sounds/v1/ambiences/calm_piano.ogg" type="audio/ogg">
   </audio>
 
   <!-- Surprise Popup Modal -->
@@ -1489,9 +1492,10 @@
     let audioCtx = null;
     let isPlayingMusic = false;
     let musicInterval = null;
-    let currentSourceMode = 'preset-1'; // 'preset-1', 'preset-2', 'synth', 'custom', 'url'
+    let currentSourceMode = 'aud'; // Default to aud.mp3 in repository
 
     const presetUrls = {
+      'aud': 'aud.mp3',
       'preset-1': 'https://actions.google.com/sounds/v1/ambiences/calm_piano.ogg',
       'preset-2': 'https://upload.wikimedia.org/wikipedia/commons/e/f3/Canon_in_D_major_-_Johann_Pachelbel.ogg'
     };
@@ -1603,11 +1607,13 @@
 
       stopSynthMusic();
 
-      if (val === 'preset-1' || val === 'preset-2') {
+      if (val === 'aud' || val === 'preset-1' || val === 'preset-2') {
         if (bgAudio) {
           bgAudio.src = presetUrls[val];
           bgAudio.load();
-          if (isPlayingMusic) bgAudio.play().catch(() => startSynthMusic());
+          if (isPlayingMusic) {
+            bgAudio.play().catch(() => startSynthMusic());
+          }
         }
       } else if (val === 'synth') {
         if (bgAudio) bgAudio.pause();
@@ -1668,6 +1674,20 @@
     }
 
     // Auto-play audio on website load
+    const bgAudioElem = document.getElementById('bg-audio');
+    if (bgAudioElem) {
+      bgAudioElem.addEventListener('error', () => {
+        if (currentSourceMode === 'aud') {
+          console.warn("aud.mp3 not found in repository root yet. Falling back to ambient preset...");
+          bgAudioElem.src = presetUrls['preset-1'];
+          bgAudioElem.load();
+          if (isPlayingMusic) {
+            bgAudioElem.play().catch(() => startSynthMusic());
+          }
+        }
+      });
+    }
+
     function attemptAutoPlay() {
       if (isPlayingMusic) return;
       const bgAudio = document.getElementById('bg-audio');
